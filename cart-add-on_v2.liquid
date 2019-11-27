@@ -1,0 +1,53 @@
+{% comment %}
+  Replace the text below with the handle of your add-on product.
+{% endcomment %}
+
+{% assign product_free = all_products['INSERT PRODUCT HANDLE HERE'] %}
+
+{% unless cart.item_count == 0 or product_free.empty? or product_free.variants.first.available == false %}
+
+  {% assign variant_free_id = product_free.variants.first.id %}
+
+  <script>
+  (function($) {
+
+    var cartItems = {{ cart.items | json }},
+        qtyInTheCart = 0,
+        cartUpdates = {};
+    
+    console.log(cartItems,cartUpdates);
+
+    for (var i=0; i<cartItems.length; i++) {
+      if ( cartItems[i].id === {{ variant_free_id }} ) {
+        qtyInTheCart = cartItems[i].quantity;
+        break;
+      }
+    }
+
+    if ( ( cartItems.length === 1 ) && ( qtyInTheCart > 0 ) ) {
+      cartUpdates = { {{ variant_free_id }}: 0 }
+    }
+    else if ( ( cartItems.length >= 1 ) && ( qtyInTheCart == 0 ) ) {
+      //return;
+      cartUpdates = { {{ variant_free_id }}: 1  }
+    }
+    else {
+      return;
+    }
+
+    var params = {
+      type: 'POST',
+      url: '/cart/update.js',
+      data: { updates: cartUpdates },
+      dataType: 'json',
+      success: function(stuff) { 
+        window.location.href = '/cart';
+      }
+    };
+
+    $.ajax(params);
+
+  })(jQuery);
+  </script>
+
+{% endunless %}
