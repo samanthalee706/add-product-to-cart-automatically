@@ -1,0 +1,4 @@
+ <!-- Include Free Gift on cart load add on -->
+    {% if cart.items_subtotal_price >= 5000 %}
+    {% include 'cart-add-on' %}
+    {% endif %}
